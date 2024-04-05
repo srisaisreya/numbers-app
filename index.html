@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .column {
+        float: left;
+        width: 33.33%;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+      .row::after {
+        content: "";
+        clear: both;
+        display: table;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row" id="login"></div>
+    <div class="row">
+      <div class="column">
+        <section>
+          <h2>Arithmetic</h2>
+          <input id="operand1" />
+          <label>+</label>
+          <input id="operand2" />
+          <button onclick="addnum()">=</button>
+          <label id="sum"></label>
+        </section>
+      </div>
+      <div class="column">
+        <section>
+          <h2>Prime check</h2>
+          <label>Number to test:</label>
+          <input id="numberToTest" />
+          <button onclick="isPrime()">Check</button>
+          <label id="primeCheckResult"></label>
+        </section>
+      </div>
+      <div class="column">
+        <section>
+          <h2>Caesar Cipher</h2>
+          <label>Text:</label>
+          <input id="textToCipher" />
+          <button onclick="cipher()">Check</button>
+          <label id="cipher"></label>
+        </section>
+      </div>
+    </div>
+    <script src="configuration.js"></script>
+    <script>
+      let hosts = configuration.hosts;
+      displayLogin();
+      async function addnum() {
+        let num1Input = document.getElementById("operand1");
+        let num2Input = document.getElementById("operand2");
+        let n = num1Input.value;
+        let m = num2Input.value;
+
+        const response = await fetch(
+          `${hosts.arithmetic_service}/addnum/${n}/${m}`
+        );
+        const sum = await response.json();
+        document.getElementById("sum").innerText = sum;
+      }
+      async function isPrime() {
+        const numberToTest = document.getElementById("numberToTest");
+        let n = numberToTest.value;
+        const headers = { Authorization: `Bearer ${configuration.token}` };
+        const response = await fetch(`${hosts.primes_service}/primes/${n}`, {
+          headers,
+        });
+
+        const result = await response.json();
+        document.getElementById("primeCheckResult").innerText = result;
+      }
+
+      async function cipher() {
+        const textToCipher = document.getElementById("textToCipher");
+        let plainText = textToCipher.value;
+        let n = 3;
+        const response = await fetch(
+          `${hosts.ciphers_service}/ciphers/caesar/${plainText}/3`
+        );
+        const result = await response.json();
+        console.log(result);
+        document.getElementById("cipher").innerText = result.cipher;
+      }
+    </script>
+  </body>
+</html>
